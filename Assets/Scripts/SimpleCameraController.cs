@@ -110,6 +110,7 @@ namespace UnityTemplateProjects
                 direction += Vector3.up;
             }
             return direction;
+            
         }
         
         void Update()

@@ -15,10 +15,11 @@ public class HyperDisk : MonoBehaviour
 
     public int p;
     public int q;
-    public int density;
+    public float density;
     public int layers;
     public Material[] materials;
     public GameObject tilePrefab;
+    
 
 
     // Start is called before the first frame update
@@ -119,6 +120,7 @@ public class HyperDisk : MonoBehaviour
         int quantity = (q == 3 && r != 0) ? p - r - 1 : p - r;
         for (int s = start; s < start + quantity; ++s)
         {
+
             // Create a polygon adjacent to P[i]
             polygons[j] = createNextPolygon(polygons[i], s % p);
             rule[j] = (q == 3 && s == start && r != 0) ? 4 : 3;
