@@ -10,10 +10,9 @@ public class HyperbolicObject : MonoBehaviour
 
     private Vector3 sloc;
 
-    public void Init(Vector3 sphericalCoords, float radius, SphericalCam cam)
+    public void Init(Vector3 sphericalCoords, SphericalCam cam)
     {
         this.cam = cam;
-        this.radius = radius;
         this.sphericalCoords = sphericalCoords;
 
     }
@@ -27,7 +26,7 @@ public class HyperbolicObject : MonoBehaviour
     private void Transform()
     {
         sloc = sphericalCoords + cam.sphericalCoords;
-        Vector4 v4 = radius * (new Vector4(
+        Vector4 v4 = (new Vector4(
             Mathf.Cos(sloc.x),
             Mathf.Sin(sloc.x) * Mathf.Cos(sloc.y),
             Mathf.Sin(sloc.x) * Mathf.Sin(sloc.y) * Mathf.Cos(sloc.z),
@@ -39,7 +38,7 @@ public class HyperbolicObject : MonoBehaviour
 
     private Vector3 StereographicProjection(Vector4 v4)
     {
-        float d = radius - v4.w;
+        float d = 1 - v4.w;
         return new Vector3(v4.x / d, v4.y / d, v4.z / d);
     }
 }

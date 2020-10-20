@@ -10,10 +10,24 @@ public class SphericalCam : MonoBehaviour
     public float radius = 1;
 
     public Vector3 sphericalCoords;
+    public Vector3 camRot;
+    public Matrix4x4 m;
 
     private void Start()
     {
-        sphericalCoords = new Vector3(5, 0, 0);
+        sphericalCoords = new Vector3(0, 0, 0);
+        m = new Matrix4x4(
+            new Vector4(Mathf.Cos(0.4f), Mathf.Sin(0.4f), 0, 0),
+            new Vector4(-Mathf.Sin(0.4f), Mathf.Cos(0.4f), 0, 0),
+            new Vector4(0, 0, Mathf.Cos(0.2f), Mathf.Sin(0.2f)),
+            new Vector4(0, 0, -Mathf.Sin(0.2f), Mathf.Cos(0.2f))
+        ) * new Matrix4x4(
+            new Vector4(Mathf.Cos(0.4f), 0, Mathf.Sin(0.4f), 0),
+            new Vector4(0, Mathf.Cos(0.2f), 0, Mathf.Sin(0.2f)),
+            new Vector4(-Mathf.Sin(0.4f), 0, Mathf.Cos(0.4f), 0),
+            new Vector4(0, -Mathf.Sin(0.2f), 0, Mathf.Cos(0.2f))
+            );
+
     }
 
     void Update()
@@ -21,9 +35,9 @@ public class SphericalCam : MonoBehaviour
         // Rotation
         if (Input.GetMouseButton(1))
         {
-            var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1));
-
-            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x + mouseMovement.y, transform.rotation.eulerAngles.y + mouseMovement.x, 0);
+            var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1)) * 0.1f;
+            camRot = new Vector3(camRot.x + mouseMovement.y, camRot.y + mouseMovement.x, 0);
+            //transform.rotation = Quaternion.Euler(r);
         }
 
 
@@ -31,38 +45,43 @@ public class SphericalCam : MonoBehaviour
         UpdateInputTranslationDirection();
     }
 
+
     void UpdateInputTranslationDirection()
     {
+        
         Vector3 direction = new Vector3();
+
         if (Input.GetKey(KeyCode.W))
         {
-            direction.z += speed;
+            direction += Vector3.forward;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            direction.z -= speed;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            direction.y += speed;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            direction.y -= speed;
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
-            direction.x -= speed;
+            direction -= Vector3.forward;
         }
         if (Input.GetKey(KeyCode.E))
         {
-            direction.x += speed;
+            direction += Vector3.up;
         }
-        if (Input.GetKeyDown(KeyCode.C)) {
-            camOnSphere = camOnSphere == false;
+        if (Input.GetKey(KeyCode.Q))
+        {
+            direction -= Vector3.up;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            direction += Vector3.right;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            direction -= Vector3.right;
         }
 
-        direction *= Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.C)) {
+            camOnSphere = camOnSphere == false;
+            transform.position = new Vector3(0, 0, 0);
+        }
+
+        direction *= speed * Time.deltaTime;
 
         sphericalCoords += direction;
 
@@ -92,10 +111,7 @@ public class SphericalCam : MonoBehaviour
 
             float d = radius - v4.w;
             transform.position = new Vector3(v4.x / d, v4.y / d, v4.z / d);
-        } else
-        {
-            transform.position = new Vector3();
         }
-
+        
     }
 }

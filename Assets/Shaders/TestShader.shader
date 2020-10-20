@@ -14,6 +14,7 @@ Shader "Unlit/TestShader"
             #include "UnityCG.cginc"
 
             struct v2f {
+
         // we'll output world space normal as one of regular ("texcoord") interpolators
         half3 worldNormal : TEXCOORD0;
         float4 pos : SV_POSITION;
