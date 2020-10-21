@@ -71,8 +71,8 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - Color_927EAAE7: {r: 0.023534775, g: 0, b: 1, a: 0}
-    - Vector3_B41A4BCF: {r: 0.22499995, g: -1.2049997, b: 0, a: 0}
-    - Vector3_DF1E0349: {r: 0, g: 0, b: 1.5109725, a: 0}
+    - Vector3_B41A4BCF: {r: -0.7599987, g: -0.87000036, b: 0, a: 0}
+    - Vector3_DF1E0349: {r: 1.9147633, g: 0, b: 5.7101355, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

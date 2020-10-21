@@ -9,13 +9,10 @@ public class SphericalCam : MonoBehaviour
     public float speed = 1;
     public float radius = 1;
 
-    public Vector3 sphericalCoords;
-    public Vector3 camRot;
     public Matrix4x4 m;
 
     private void Start()
     {
-        sphericalCoords = new Vector3(0, 0, 0);
         m = new Matrix4x4(
             new Vector4(Mathf.Cos(0.4f), Mathf.Sin(0.4f), 0, 0),
             new Vector4(-Mathf.Sin(0.4f), Mathf.Cos(0.4f), 0, 0),
@@ -32,13 +29,7 @@ public class SphericalCam : MonoBehaviour
 
     void Update()
     {
-        // Rotation
-        if (Input.GetMouseButton(1))
-        {
-            var mouseMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1)) * 0.1f;
-            camRot = new Vector3(camRot.x + mouseMovement.y, camRot.y + mouseMovement.x, 0);
-            //transform.rotation = Quaternion.Euler(r);
-        }
+        
 
 
         // Translation
@@ -50,6 +41,7 @@ public class SphericalCam : MonoBehaviour
     {
         
         Vector3 direction = new Vector3();
+        Vector3 mouseMovement = new Vector3();
 
         if (Input.GetKey(KeyCode.W))
         {
@@ -76,42 +68,72 @@ public class SphericalCam : MonoBehaviour
             direction -= Vector3.right;
         }
 
-        if (Input.GetKeyDown(KeyCode.C)) {
-            camOnSphere = camOnSphere == false;
-            transform.position = new Vector3(0, 0, 0);
+        // Rotation
+        if (Input.GetMouseButton(1))
+        {
+            mouseMovement = new Vector3(-Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1), 0) * 0.1f;
         }
+
 
         direction *= speed * Time.deltaTime;
 
-        sphericalCoords += direction;
 
-        if (sphericalCoords.x > 2 * Mathf.PI)
-            sphericalCoords.x -= 2 * Mathf.PI;
-        else if (sphericalCoords.x < 0)
-            sphericalCoords.x += 2 * Mathf.PI;
+        // https://www.shadertoy.com/view/WlGSDV
 
-        if (sphericalCoords.y > 2 * Mathf.PI)
-            sphericalCoords.y -= 2 * Mathf.PI;
-        else if (sphericalCoords.y < 0)
-            sphericalCoords.y += 2 * Mathf.PI;
+        // look left and right
+        float s = Mathf.Sin(mouseMovement.z); 
+        float c = Mathf.Cos(mouseMovement.z);
+        Matrix4x4 p_xy = new Matrix4x4(
+            new Vector4(c, s, 0, 0),
+            new Vector4(-s, c, 0, 0),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(0, 0, 0, 1));
 
-        if (sphericalCoords.z > 2 * Mathf.PI)
-            sphericalCoords.z -= 2 * Mathf.PI;
-        else if (sphericalCoords.z < 0)
-            sphericalCoords.z += 2 * Mathf.PI;
+        // look up and down
+        s = Mathf.Sin(mouseMovement.x);
+        c = Mathf.Cos(mouseMovement.x);
+        Matrix4x4 p_xz = new Matrix4x4(
+            new Vector4(c, 0, s, 0),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(-s, 0, c, 0),
+            new Vector4(0, 0, 0, 1));
 
-        if (camOnSphere)
-        {
-            Vector4 v4 = radius * (new Vector4(
-                            Mathf.Cos(sphericalCoords.x),
-                            Mathf.Sin(sphericalCoords.x) * Mathf.Cos(sphericalCoords.y),
-                            Mathf.Sin(sphericalCoords.x) * Mathf.Sin(sphericalCoords.y) * Mathf.Cos(sphericalCoords.z),
-                            Mathf.Sin(sphericalCoords.x) * Mathf.Sin(sphericalCoords.y) * Mathf.Sin(sphericalCoords.z)
-                            ));
+        // move forward and backward
+        s = Mathf.Sin(direction.x);
+        c = Mathf.Cos(direction.x);
+        Matrix4x4 p_xw = new Matrix4x4(
+            new Vector4(c, 0, 0, s),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(-s, 0, 0, c));
 
-            float d = radius - v4.w;
-            transform.position = new Vector3(v4.x / d, v4.y / d, v4.z / d);
-        }
-        
+        // look cw roll
+        s = Mathf.Sin(mouseMovement.y);
+        c = Mathf.Cos(mouseMovement.y);
+        Matrix4x4 p_yz = new Matrix4x4(
+            new Vector4(1, 0, 0, 0),
+            new Vector4(0, c, s, 0),
+            new Vector4(0, -s, c, 0),
+            new Vector4(0, 0, 0, 1));
+
+        // move right and left
+        s = Mathf.Sin(direction.y);
+        c = Mathf.Cos(direction.y);
+        Matrix4x4 p_yw = new Matrix4x4(
+            new Vector4(1, 0, 0, 0),
+            new Vector4(0, c, 0, s),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(0, -s, 0, c));
+
+        // move up and down
+        s = Mathf.Sin(direction.z);
+        c = Mathf.Cos(direction.z);
+        Matrix4x4 p_zw = new Matrix4x4(
+            new Vector4(1, 0, 0, 0),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(0, 0, c, s),
+            new Vector4(0, 0, -s, c));
+
+        m = m * p_xy * p_xz * p_xw * p_yz * p_yw * p_zw;
     }
 }

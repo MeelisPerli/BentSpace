@@ -93,8 +93,8 @@ public class GreatCircle : MonoBehaviour
         }
 
 
-        HyperCube o = initcube(smat3, 5, 5, 5, 1);
-        o.moving = true;
+        //HyperCube o = initcube(smat3, 5, 5, 5, 1);
+        //o.moving = true;
     }
 
     private HyperCube initcube(Material mat, int a, int b, int c, int d)

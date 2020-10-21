@@ -20,9 +20,10 @@ public class HyperbolicObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Transform();
+        //Transform();
     }
 
+    /*
     private void Transform()
     {
         sloc = sphericalCoords + cam.sphericalCoords;
@@ -40,5 +41,5 @@ public class HyperbolicObject : MonoBehaviour
     {
         float d = 1 - v4.w;
         return new Vector3(v4.x / d, v4.y / d, v4.z / d);
-    }
+    }*/
 }
