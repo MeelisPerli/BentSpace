@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HyperCube : MonoBehaviour
+public class SphericalCube : MonoBehaviour
 {
 
     public Material material;
@@ -10,7 +10,6 @@ public class HyperCube : MonoBehaviour
     private Vector3[] sVertices; // in spherical coords
     private Vector3[] vertices;
 
-    public bool moving;
 
     private void Start()
     {
@@ -19,10 +18,6 @@ public class HyperCube : MonoBehaviour
     }
 
     void Update() {
-        if (moving)
-        {
-            sVertices = SpaceManager.Instance.MoveObjectAroundPoint(sVertices);
-        }
     }
 
     public void InitCube(float x, float y, float z, float sideLen)

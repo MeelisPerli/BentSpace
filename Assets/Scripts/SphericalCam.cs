@@ -14,6 +14,13 @@ public class SphericalCam : MonoBehaviour
     private void Start()
     {
         m = new Matrix4x4(
+            new Vector4(0.99612f, 0.07062f, 0.05237f, 0.00100f),
+            new Vector4(-0.04707f, -0.00912f, 0.89924f, 0.43483f),
+            new Vector4(-0.01473f, -0.09971f, 0.43167f, -0.89639f),
+            new Vector4(0.07279f, -0.99246f, -0.04790f, 0.08613f)
+        );
+
+        /*m = new Matrix4x4(
             new Vector4(Mathf.Cos(0.4f), Mathf.Sin(0.4f), 0, 0),
             new Vector4(-Mathf.Sin(0.4f), Mathf.Cos(0.4f), 0, 0),
             new Vector4(0, 0, Mathf.Cos(0.2f), Mathf.Sin(0.2f)),
@@ -23,7 +30,7 @@ public class SphericalCam : MonoBehaviour
             new Vector4(0, Mathf.Cos(0.2f), 0, Mathf.Sin(0.2f)),
             new Vector4(-Mathf.Sin(0.4f), 0, Mathf.Cos(0.4f), 0),
             new Vector4(0, -Mathf.Sin(0.2f), 0, Mathf.Cos(0.2f))
-            );
+            );*/
 
     }
 
@@ -133,6 +140,7 @@ public class SphericalCam : MonoBehaviour
             new Vector4(0, 1, 0, 0),
             new Vector4(0, 0, c, s),
             new Vector4(0, 0, -s, c));
+
 
         m = m * p_xy * p_xz * p_xw * p_yz * p_yw * p_zw;
     }

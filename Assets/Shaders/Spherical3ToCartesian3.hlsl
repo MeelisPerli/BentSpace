@@ -1,4 +1,4 @@
-void tanh3_float(float3 A, float4x4 M, out float3 Out)
+void Spherical3ToCartesian3_float(float3 A, float4x4 M, out float3 Out)
 {
 
 	float f1 = A.x;
