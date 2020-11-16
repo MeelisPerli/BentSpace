@@ -18,6 +18,59 @@ public class SphericalCube : MonoBehaviour
     }
 
     void Update() {
+
+    }
+
+    public void InitTile(float x, float y, float z, float sideLen)
+    {
+        sVertices = new Vector3[4];
+        vertices = new Vector3[4];
+        int[] triangles = new int[6];
+
+        // vertices
+
+        sVertices[0] = new Vector3(x, y, z);
+        sVertices[1] = new Vector3(x + sideLen, y, z);
+        sVertices[2] = new Vector3(x, y + sideLen, z);
+        sVertices[3] = new Vector3(x + sideLen, y + sideLen, z);
+
+        // triangles
+
+        //bottom
+        triangles[0] = 0;
+        triangles[1] = 1;
+        triangles[2] = 3;
+        triangles[3] = 2;
+        triangles[4] = 0;
+        triangles[5] = 3;
+
+        //top
+        //triangles[6] = 0;
+        //triangles[7] = 3;
+        //triangles[8] = 1;
+        //triangles[9] = 2;
+        //triangles[10] = 3;
+        //triangles[11] = 0;
+
+        // transformations
+
+        // init
+        Mesh mesh = new Mesh();
+        mesh.vertices = sVertices;
+        mesh.triangles = triangles;
+
+        Vector2[] uv = new Vector2[4];
+        for (int i = 0; i < 4; i++)
+        {
+            uv[i] = new Vector2(sVertices[i].x, sVertices[i].y);
+        }
+
+        mesh.uv = uv;
+        // for disabling frustrum culling
+        mesh.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(1000, 1000, 1000));
+
+        GetComponent<MeshFilter>().mesh = mesh;
+        GetComponent<MeshRenderer>().material = material;
     }
 
     public void InitCube(float x, float y, float z, float sideLen)
@@ -95,6 +148,13 @@ public class SphericalCube : MonoBehaviour
         mesh.vertices = sVertices;
         mesh.triangles = triangles;
 
+        Vector2[] uv = new Vector2[8];
+        for (int i = 0; i < 8; i++)
+        {
+            uv[i] = new Vector2(sVertices[i].x, sVertices[i].y);
+        }
+
+        mesh.uv = uv;
         // for disabling frustrum culling
         mesh.bounds = new Bounds(new Vector3(0,0,0), new Vector3(1000, 1000, 1000));
 

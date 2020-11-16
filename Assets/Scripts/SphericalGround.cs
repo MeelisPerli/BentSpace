@@ -7,8 +7,7 @@ public class SphericalGround : MonoBehaviour
 
     public SphericalCube hypCubePref;
 
-    public Material smat1;
-    public Material smat2;
+    public Material material;
 
     private SpaceManager sm;
 
@@ -26,11 +25,6 @@ public class SphericalGround : MonoBehaviour
         {
             for (int y = 0; y < sm.density; y++)
             {
-                Material material = smat1;
-                if ((x + y)%2 == 0)
-                {
-                    material = smat2;
-                }
                 initcube(material, x, y, 0, 1);
             }
         }
@@ -41,7 +35,7 @@ public class SphericalGround : MonoBehaviour
     {
         SphericalCube o = Instantiate(hypCubePref);
         o.material = mat;
-        o.InitCube(sm.getGridPos(a), sm.getGridPos(b), sm.getGridPos(c), sm.getGridPos(d));
+        o.InitTile(sm.getGridPos(a), sm.getGridPos(b), sm.getGridPos(c) + 0.2f, sm.getGridPos(d));
         return o;
     }
 }

@@ -1,24 +1,38 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SphericalCam : MonoBehaviour
 {
     public bool invertY;
-    public bool camOnSphere;
+    public bool flight;
     public float speed = 1;
     public float radius = 1;
 
     public Matrix4x4 m;
+    public Vector3 posOn3Sphere;
+    public float rotOn3Sphere;
+
+    private Vector3 direction;
+    private Vector3 mouseMovement;
 
     private void Start()
     {
+        direction = new Vector3();
+        mouseMovement = new Vector3();
+        posOn3Sphere = new Vector3(0, 1.5f*Mathf.PI, 0);
+        rotOn3Sphere = 0;
+
+        m = SpaceManager.Instance.getYWRotMat(posOn3Sphere.y);
+        /*
         m = new Matrix4x4(
             new Vector4(0.99612f, 0.07062f, 0.05237f, 0.00100f),
             new Vector4(-0.04707f, -0.00912f, 0.89924f, 0.43483f),
             new Vector4(-0.01473f, -0.09971f, 0.43167f, -0.89639f),
             new Vector4(0.07279f, -0.99246f, -0.04790f, 0.08613f)
         );
+        */
 
         /*m = new Matrix4x4(
             new Vector4(Mathf.Cos(0.4f), Mathf.Sin(0.4f), 0, 0),
@@ -38,17 +52,28 @@ public class SphericalCam : MonoBehaviour
     {
         
 
+        UpdateUserKeyboardInputs();
+        UpdateUserMouseMovementInputs();
 
-        // Translation
-        UpdateInputTranslationDirection();
+        if (flight)
+        {
+            UpdateInputTranslationDirection3DFlight();
+        }
+        else
+        {
+            UpdateInputTranslationDirection2DPlane();
+        }
+            
+
+
     }
+    
 
-
-    void UpdateInputTranslationDirection()
+    private void UpdateUserKeyboardInputs()
     {
-        
-        Vector3 direction = new Vector3();
-        Vector3 mouseMovement = new Vector3();
+        direction.x = 0;
+        direction.y = 0;
+        direction.z = 0;
 
         if (Input.GetKey(KeyCode.W))
         {
@@ -74,74 +99,116 @@ public class SphericalCam : MonoBehaviour
         {
             direction -= Vector3.right;
         }
+        direction *= speed * Time.deltaTime;
+    }
 
-        // Rotation
+    private void UpdateUserMouseMovementInputs()
+    {
         if (Input.GetMouseButton(1))
         {
             mouseMovement = new Vector3(-Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y") * (invertY ? 1 : -1), 0) * 0.1f;
+            if (!flight)
+            {
+                float a = transform.rotation.eulerAngles.x + mouseMovement.y * 10000 * Time.deltaTime;
+                if (a >= 180 && a < 275)
+                {
+                    a = -85;
+                }
+                else if (a > 85 && a < 180)
+                {
+                    a = 85;
+                }
+
+                transform.rotation = Quaternion.Euler(new Vector3(a, 0, 0));
+                
+                rotOn3Sphere +=  mouseMovement.x * 100 * Time.deltaTime;
+                
+            }   
         }
+    }
 
-
-        direction *= speed * Time.deltaTime;
-
-
+    // Uses all 6 rotation matrices
+    private void UpdateInputTranslationDirection3DFlight()
+    {
         // https://www.shadertoy.com/view/WlGSDV
 
-        // look left and right
-        float s = Mathf.Sin(mouseMovement.z); 
-        float c = Mathf.Cos(mouseMovement.z);
-        Matrix4x4 p_xy = new Matrix4x4(
-            new Vector4(c, s, 0, 0),
-            new Vector4(-s, c, 0, 0),
-            new Vector4(0, 0, 1, 0),
-            new Vector4(0, 0, 0, 1));
-
-        // look up and down
-        s = Mathf.Sin(mouseMovement.x);
-        c = Mathf.Cos(mouseMovement.x);
-        Matrix4x4 p_xz = new Matrix4x4(
-            new Vector4(c, 0, s, 0),
-            new Vector4(0, 1, 0, 0),
-            new Vector4(-s, 0, c, 0),
-            new Vector4(0, 0, 0, 1));
-
-        // move forward and backward
-        s = Mathf.Sin(direction.x);
-        c = Mathf.Cos(direction.x);
-        Matrix4x4 p_xw = new Matrix4x4(
-            new Vector4(c, 0, 0, s),
-            new Vector4(0, 1, 0, 0),
-            new Vector4(0, 0, 1, 0),
-            new Vector4(-s, 0, 0, c));
-
         // look cw roll
-        s = Mathf.Sin(mouseMovement.y);
-        c = Mathf.Cos(mouseMovement.y);
-        Matrix4x4 p_yz = new Matrix4x4(
-            new Vector4(1, 0, 0, 0),
-            new Vector4(0, c, s, 0),
-            new Vector4(0, -s, c, 0),
-            new Vector4(0, 0, 0, 1));
+        Matrix4x4 p_xy = SpaceManager.Instance.getXYRotMat(mouseMovement.z);
+        // look left and right
+        Matrix4x4 p_xz = SpaceManager.Instance.getXZRotMat(mouseMovement.x);
+        // look up and down
+        Matrix4x4 p_yz = SpaceManager.Instance.getYZRotMat(mouseMovement.y);
 
         // move right and left
-        s = Mathf.Sin(direction.y);
-        c = Mathf.Cos(direction.y);
-        Matrix4x4 p_yw = new Matrix4x4(
-            new Vector4(1, 0, 0, 0),
-            new Vector4(0, c, 0, s),
-            new Vector4(0, 0, 1, 0),
-            new Vector4(0, -s, 0, c));
-
+        Matrix4x4 p_xw = SpaceManager.Instance.getXWRotMat(direction.x);
         // move up and down
-        s = Mathf.Sin(direction.z);
-        c = Mathf.Cos(direction.z);
-        Matrix4x4 p_zw = new Matrix4x4(
-            new Vector4(1, 0, 0, 0),
-            new Vector4(0, 1, 0, 0),
-            new Vector4(0, 0, c, s),
-            new Vector4(0, 0, -s, c));
+        Matrix4x4 p_yw = SpaceManager.Instance.getYWRotMat(direction.y);
+        // move forward and backward
+        Matrix4x4 p_zw = SpaceManager.Instance.getZWRotMat(direction.z);
 
 
         m = m * p_xy * p_xz * p_xw * p_yz * p_yw * p_zw;
+    }
+
+    // Deals with rotations in spherical coordinates, to make it able to walk on the surface
+    private void UpdateInputTranslationDirection2DPlane()
+    {
+        /*
+        posOn3Sphere += direction;
+        posOn3Sphere.x = AngleLimiter(posOn3Sphere.x, (float) (2 * Math.PI));
+        //posOn3Sphere.y = AngleLimiter(posOn3Sphere.y, (float) (Math.PI));
+        posOn3Sphere.z = AngleLimiter(posOn3Sphere.z, (float) (2 * Math.PI));
+
+
+        
+        // move left and right
+        Matrix4x4 xy = SpaceManager.Instance.getXYRotMat(posOn3Sphere.x);
+        // move up and down
+        Matrix4x4 yw = SpaceManager.Instance.getYWRotMat(posOn3Sphere.y);
+        // move forward and backward
+        Matrix4x4 yz = SpaceManager.Instance.getYZRotMat(-posOn3Sphere.z);
+
+        // look left and right
+        Matrix4x4 xz = SpaceManager.Instance.getXZRotMat(rotOn3Sphere);
+
+
+        m = xz * yz * yw * xy;*/
+
+        
+        // look cw roll
+        //Matrix4x4 p_xy = SpaceManager.Instance.getXYRotMat(mouseMovement.z);
+        // look left and right
+        Matrix4x4 look_r_l = SpaceManager.Instance.getXZRotMat(mouseMovement.x);
+        // look up and down
+        //Matrix4x4 p_yz = SpaceManager.Instance.getYZRotMat(mouseMovement.y);
+
+        // move right and left
+        Matrix4x4 move_r_l = SpaceManager.Instance.getXWRotMat(direction.x);
+        // move forward and backward
+        Matrix4x4 move_f_b = SpaceManager.Instance.getZWRotMat(direction.z);
+        // move up and down
+        //Matrix4x4 move_u_d = SpaceManager.Instance.getYWRotMat(direction.y);
+
+        posOn3Sphere.x += direction.x;
+        posOn3Sphere.z += direction.z;
+
+        m = m * look_r_l * move_r_l * move_f_b;
+
+    }
+
+
+    private float AngleLimiter(float a, float lim)
+    {
+        while (a > lim)
+        {
+            a -= lim;
+        }
+            
+        while (a < 0)
+        {
+            a += lim;
+        }
+
+        return a;
     }
 }

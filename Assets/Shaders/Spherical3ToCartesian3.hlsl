@@ -1,4 +1,4 @@
-void Spherical3ToCartesian3_float(float3 A, float4x4 M, out float3 Out)
+void Spherical3ToCartesian3_float(float3 A, float4x4 M, float3 camPos, out float3 Out)
 {
 
 	float f1 = A.x;
@@ -15,11 +15,9 @@ void Spherical3ToCartesian3_float(float3 A, float4x4 M, out float3 Out)
 		);
 
 	v4 = mul(v4, M);
-	
-	//v4 = mul(p_zw, mul(p_yw, mul(p_yz, mul(p_xw, mul(p_xz, mul(p_xy, v4))))));
+
 	float d = 1 - v4.w;
 	
-	Out = float3((1 + v4.x/d), (1 + v4.y / d), (1 + v4.z / d));
-	
-	
+	Out = float3(v4.x / d, v4.y / d, v4.z / d);
+
 }

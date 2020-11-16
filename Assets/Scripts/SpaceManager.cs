@@ -54,7 +54,8 @@ public class SpaceManager : MonoBehaviour
         return vertexSlots[a % density];
     }
 
-    public Matrix4x4 getMoveUpDownRotMat(float phi)
+    // for moving
+    public Matrix4x4 getZWRotMat(float phi)
     {
         float s = Mathf.Sin(phi);
         float c = Mathf.Cos(phi);
@@ -64,8 +65,7 @@ public class SpaceManager : MonoBehaviour
             new Vector4(0, 0, c, s),
             new Vector4(0, 0, -s, c));
     }
-
-    public Matrix4x4 getMoveLeftRightRotMat(float phi)
+    public Matrix4x4 getYWRotMat(float phi)
     {
         float s = Mathf.Sin(phi);
         float c = Mathf.Cos(phi);
@@ -75,8 +75,7 @@ public class SpaceManager : MonoBehaviour
             new Vector4(0, 0, 1, 0),
             new Vector4(0, -s, 0, c));
     }
-
-    public Matrix4x4 getMoveForwardBackRotMat(float phi)
+    public Matrix4x4 getXWRotMat(float phi)
     {
         float s = Mathf.Sin(phi);
         float c = Mathf.Cos(phi);
@@ -85,6 +84,38 @@ public class SpaceManager : MonoBehaviour
             new Vector4(0, 1, 0, 0),
             new Vector4(0, 0, 1, 0),
             new Vector4(-s, 0, 0, c));
+    }
+
+    // for looking
+    public Matrix4x4 getXYRotMat(float phi)
+    {
+        float s = Mathf.Sin(phi);
+        float c = Mathf.Cos(phi);
+        return new Matrix4x4(
+            new Vector4(c, s, 0, 0),
+            new Vector4(-s, c, 0, 0),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(0, 0, 0, 1));
+    }
+    public Matrix4x4 getXZRotMat(float phi)
+    {
+        float s = Mathf.Sin(phi);
+        float c = Mathf.Cos(phi);
+        return new Matrix4x4(
+            new Vector4(c, 0, s, 0),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(-s, 0, c, 0),
+            new Vector4(0, 0, 0, 1));
+    }
+    public Matrix4x4 getYZRotMat(float phi)
+    {
+        float s = Mathf.Sin(phi);
+        float c = Mathf.Cos(phi);
+        return new Matrix4x4(
+            new Vector4(1, 0, 0, 0),
+            new Vector4(0, c, s, 0),
+            new Vector4(0, -s, c, 0),
+            new Vector4(0, 0, 0, 1));
     }
 
 
@@ -124,7 +155,7 @@ public class SpaceManager : MonoBehaviour
 
 
     // Conversion between Spherical and Cartesian Systems
-    private Vector4 SphericalToCartesian(Vector3 sphericalCoords)
+    public Vector4 SphericalToCartesian(Vector3 sphericalCoords)
     {
 
         return new Vector4(
@@ -135,7 +166,7 @@ public class SpaceManager : MonoBehaviour
             );
     }
 
-    private Vector3 CartesianToSpherical(Vector4 CartCoords)
+    public Vector3 CartesianToSpherical(Vector4 CartCoords)
     {
         float s = CartCoords.z * CartCoords.z + CartCoords.w * CartCoords.w;
         float f3 = Mathf.Acos(CartCoords.z / Mathf.Sqrt(s));
@@ -156,7 +187,7 @@ public class SpaceManager : MonoBehaviour
     }
 
     // Stereograpgic projections
-    private Vector4 InverseStereographicProjection(Vector3 v3)
+    public Vector4 InverseStereographicProjection(Vector3 v3)
     {
 
         float d = 1 + v3.x* v3.x + v3.y * v3.y + v3.z * v3.z;
@@ -164,7 +195,7 @@ public class SpaceManager : MonoBehaviour
         return new Vector4((2 * v3.x)/d, (2 * v3.y) / d, (2 * v3.z) / d, (d - 2) / d);
     }
 
-    private Vector3 StereographicProjection(Vector4 v4)
+    public Vector3 StereographicProjection(Vector4 v4)
     {
         float d = 1 - v4.w;
         return new Vector3(v4.x / d, v4.y / d, v4.z / d);
