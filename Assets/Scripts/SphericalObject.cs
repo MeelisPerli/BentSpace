@@ -21,7 +21,7 @@ public class SphericalObject : MonoBehaviour
         vecs3 = normalizeAll(meshfilter.mesh.vertices);
 
         updateVecs();
-        meshfilter.mesh.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
+        meshfilter.mesh.bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(100, 100, 100));
     }
 
     private void Update()

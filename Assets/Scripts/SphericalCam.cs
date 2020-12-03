@@ -153,62 +153,13 @@ public class SphericalCam : MonoBehaviour
     // Deals with rotations in spherical coordinates, to make it able to walk on the surface
     private void UpdateInputTranslationDirection2DPlane()
     {
-        /*
-        posOn3Sphere += direction;
-        posOn3Sphere.x = AngleLimiter(posOn3Sphere.x, (float) (2 * Math.PI));
-        //posOn3Sphere.y = AngleLimiter(posOn3Sphere.y, (float) (Math.PI));
-        posOn3Sphere.z = AngleLimiter(posOn3Sphere.z, (float) (2 * Math.PI));
 
-
-        
-        // move left and right
-        Matrix4x4 xy = SpaceManager.Instance.getXYRotMat(posOn3Sphere.x);
-        // move up and down
-        Matrix4x4 yw = SpaceManager.Instance.getYWRotMat(posOn3Sphere.y);
-        // move forward and backward
-        Matrix4x4 yz = SpaceManager.Instance.getYZRotMat(-posOn3Sphere.z);
-
-        // look left and right
-        Matrix4x4 xz = SpaceManager.Instance.getXZRotMat(rotOn3Sphere);
-
-
-        m = xz * yz * yw * xy;*/
-
-        
-        // look cw roll
-        //Matrix4x4 p_xy = SpaceManager.Instance.getXYRotMat(mouseMovement.z);
-        // look left and right
         Matrix4x4 look_r_l = SpaceManager.Instance.getXZRotMat(mouseMovement.x);
-        // look up and down
-        //Matrix4x4 p_yz = SpaceManager.Instance.getYZRotMat(mouseMovement.y);
 
-        // move right and left
         Matrix4x4 move_r_l = SpaceManager.Instance.getXWRotMat(direction.x);
-        // move forward and backward
         Matrix4x4 move_f_b = SpaceManager.Instance.getZWRotMat(direction.z);
-        // move up and down
-        //Matrix4x4 move_u_d = SpaceManager.Instance.getYWRotMat(direction.y);
-
-        posOn3Sphere.x += direction.x;
-        posOn3Sphere.z += direction.z;
 
         m = m * look_r_l * move_r_l * move_f_b;
 
-    }
-
-
-    private float AngleLimiter(float a, float lim)
-    {
-        while (a > lim)
-        {
-            a -= lim;
-        }
-            
-        while (a < 0)
-        {
-            a += lim;
-        }
-
-        return a;
     }
 }
