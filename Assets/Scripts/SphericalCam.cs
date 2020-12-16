@@ -99,6 +99,20 @@ public class SphericalCam : MonoBehaviour
         {
             direction -= Vector3.right;
         }
+        
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            flight = !flight;
+            if (!flight)
+            {
+                m = SpaceManager.Instance.getYWRotMat(posOn3Sphere.y);
+            }
+            else
+            {
+                transform.rotation = new Quaternion();
+            }
+        }
+
         direction *= speed * Time.deltaTime;
     }
 
